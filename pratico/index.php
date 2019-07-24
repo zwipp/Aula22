@@ -2,7 +2,19 @@
 
     define('J','contatos.json'); //defindo uma constante para o nome do arquivo
 
-    //carregando o conteudo do arquivo para uma variavel
+   //função para validar dados do post
+   function errosDoPost(){
+       $erros =[];
+       if (!isset($_POST['nome']) || $_POST['nome'] == '') {
+           $erros[] = 'errNome';
+       }
+
+       if (!isset($_POST['email']) || $_POST['email'] == '') {
+        $erros[] = 'errEmail';
+        }
+
+        return $erros;
+   }
     
     function getContatos(){ //coloca em uma função pois será usados diversas vezes
 
@@ -28,9 +40,19 @@
         file_put_contents(J,$json);
     }
 
+    //verificando o post
+    $erros = errosDoPost();
+
     if($_POST){ //ver se tem conteudo
-        //adicionar contato ao arquivo json
-        addContato($_POST['nome'],$_POST['email']);
+
+        if(count($erros) == 0){ //só vai executar se a quantidades de erros for 0
+            //adicionar contato ao arquivo json
+            addContato($_POST['nome'],$_POST['email']);
+        }
+    }
+
+    else{
+        $erros = [];
     }
 
     $contatos = getContatos();
@@ -58,8 +80,8 @@
     </ul>
     
     <form action="index.php" method="post">
-        <input required type="text" name="nome" id="nome" placeholder="digite um nome">
-        <input required type="email" name="email" id="email" placeholder="digite um email">
+        <input <?= (in_array('errNome', $erros)? 'style="border:red 1px solid"' : ''); ?> type="text" name="nome" id="nome" placeholder="digite um nome">
+        <input  type="email" name="email" id="email" placeholder="digite um email">
         <button type="submit">Salvar</button>
     </form>
 
